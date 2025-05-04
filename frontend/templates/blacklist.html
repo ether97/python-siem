@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IP Blacklist</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        input[type="text"] { padding: 0.5em; width: 200px; }
+        input[type="submit"] { padding: 0.5em 1em; }
+    </style>
+</head>
+<body>
+    <h2>Blacklist an IP</h2>
+    <form method="POST">
+        <input type="text" name="ip" placeholder="Enter IP address" required>
+        <input type="submit" value="Blacklist">
+    </form>
+
+    <h3>Current Blacklisted IPs:</h3>
+    <ul>
+        {% for ip in ips %}
+            <li>{{ ip }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
