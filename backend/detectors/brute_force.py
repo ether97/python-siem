@@ -4,9 +4,6 @@ import json
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-# Example log line format (Ubuntu auth.log style):
-# "Apr 24 10:01:12 myhost sshd[12345]: Failed password for invalid user admin from 192.168.1.100 port 22 ssh2"
-
 def load_file(filename):
     # resolve the absolute path relative to the script location
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -28,21 +25,26 @@ def load_file(filename):
         return set()
 
 def convert_to_datetime_obj(timestamp):
-    fmt = "%b %d %H:%M:%S"
+    fmt = "%H:%M:%S"
     year = datetime.now().year
     datetime_obj = datetime.strptime(f"{year} {timestamp}", f"%Y {fmt}")
     return datetime_obj
 
+# Parse log line to extract timestamp and IP address
 def parse_log_line(line):
-    # if you want just the IP
-    # match = re.search(r'from (\d+\.\d+\.\d+\.\d+)', line)
-    # IP and timestamp
-    match = re.search(r'^(\w{3} +\d+ \d+:\d+:\d+).*from (\d+\.\d+\.\d+\.\d+)', line)
-    if match:
-        timestamp = convert_to_datetime_obj(match.group(1))
-        ip = match.group(2)
+    # match = re.search(r'^(\w{3} +\d+ \d+:\d+:\d+).*from (\d+\.\d+\.\d+\.\d+)', line)
+    # example log:
+    # 2025-05-04T19:18:01.610446-04:00 ZEUS sshd[15682]: Failed password for invalid user admin from 192.168.1.101 port 22 ssh2
 
+    # Update regex to match the correct timestamp format with 'T' and the IP address
+    pattern = r'T(\d{2}:\d{2}:\d{2}).*from (\d+\.\d+\.\d+\.\d+)'
+    
+    match = re.search(pattern, line)
+    if match:
+        timestamp = convert_to_datetime_obj(match.group(1))  # Extract the time part
+        ip = match.group(2)  # Extract the IP address
         return timestamp, ip
+
     return None, None
 
 def detect_brute_force(logs, threshold_seconds=60, threshold_count=3):
@@ -73,11 +75,11 @@ def detect_brute_force(logs, threshold_seconds=60, threshold_count=3):
      #       print(f"[ALERT] Potential brute-force attack from {ip} ({len(times)} attempts)")
 
     for ip, data in attempts.items():
-        print(f"IP: {ip}, Time: {data['timestamps']}, Count: {data['count']}")
+        # print(f"IP: {ip}, Time: {data['timestamps']}, Count: {data['count']}")
         if data['count'] >= threshold_count:
             within_threshold = (data['timestamps'][-1] - data['timestamps'][0]).total_seconds() <= threshold_seconds
             if within_threshold:
-                print(f"[ALERT] Potential brute-force attack from {ip}: {threshold_count} attempts")
+                print(f"[ALERT] Potential brute-force attack from {ip}: {data['count']} attempts")
 
 
 

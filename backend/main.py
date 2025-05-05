@@ -5,5 +5,5 @@ def read_logs(log_file):
 		return f.readlines()
 
 if __name__ == "__main__":
-	logs = read_logs('logs/auth.log')
+	logs = read_logs('logs/auth.log/failed_logins/192.168.1.101')
 	detect_brute_force(logs)
