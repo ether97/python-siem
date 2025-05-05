@@ -1,0 +1,55 @@
+# things to look for
+
+1. failed ssh logins:
+	1.`ssh invaliduser@localhost`
+	1. looks like: `Failed password for invalid user invaliduser from 127.0.0.1`
+
+1. repeated SSH logins:
+	1. `for i in {1..5}; do ssh invaliduser@localhost; done`
+
+1. sudo permissions denied:
+	1. `<user> is not in the sudoers file. This incident will be reported.`
+
+1. unauthorized cronjobs:
+	1. trying to add a cronjob as a restricted user:
+	1. `crontab -e`
+
+# important files for attackers
+
+1. credentials and user info
+
+1. `/etc/passwd` - list all users in the system
+1. `/etc/shadow` - stores hashed passwords
+1. `~/.bash_history` - shell history
+1. `~/.ssh/authorized_keys` or `/id_rsa` - ssh keys for access
+1. `~/.netrc` - may contain plain-text credentials for ftp and other services
+1. `/var/log/auth.log` 
+1. `/etc/sudoers` - who can run commands as root
+
+1. system config and privilege escalation
+
+1. `/etc/sudoers` - controls sudo permissions
+1. `/etc/group` - group memberships
+1. `/etc/cron*` or `/var/spool/cron/` - persistence via scheduled tasks
+1. `/etc/profile` or `/.bashrc` or `~/.bash_profile` - persistent commands
+
+1. services and app configs
+
+1. `/var/www/html` - web server (apache, nginx)
+1. `/etc/nginx/nginx.conf` or `/etc/apache2/apache2.conf` - web server configs
+1. `/etc/mysql/my.cnf` - db credentials	
+1. `.env` - secrets, db passwords, API keys
+
+1. enumeration
+
+1. `/var/log/auth.log` - logins, sudo usage, SSH attempts
+1. `/var/log/syslog` - general system logs
+1. `/var/log/secure`
+1. `/var/log/wtmp` or `/var/log/btmp` or `/var/run/utmp`
+
+1. app secrets
+
+1. `/opt` or `/srv` - custom app configs
+1. `docker-compose.yml` - contains service credentials
+1. `~/.kube/config` - k8s 
+
